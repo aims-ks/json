@@ -50,17 +50,24 @@ public class JSONTest {
 
 		Assert.assertNotNull("The JSON Object is null", jsonObject);
 
+		// Check for property that has never been read
+		Set<String> neverVisited = jsonObject.getNeverVisited();
+		Assert.assertNotNull("List of never visited attribute is null at the beginning", neverVisited);
+		Assert.assertFalse("List of never visited attribute is empty at the beginning", neverVisited.isEmpty());
+
 		// Try to load an object
 		JSONObject countries = jsonObject.get(JSONObject.class, "countries");
 		Assert.assertNotNull("Countries is null", countries);
 
 		// Visit all attributes of all countries
 		for (String countryId : countries.keySet()) {
+			// IMPORTANT: The cast in only performed when the value is stored in a variable.
+			//   Removing the variables (but keeping the "get") would make the test pointless.
 			JSONObject country = countries.get(JSONObject.class, countryId);
-			country.get(String.class, "name");
-			country.get(String.class, "capital");
-			country.get(Float.class, "area");
-			country.get(Integer.class, "population");
+			String name       = country.get(String.class, "name");
+			String capital    = country.get(String.class, "capital");
+			Float area        = country.get(Float.class, "area");
+			Double population = country.get(Double.class, "population");
 		}
 
 		// Try to load an array
@@ -87,9 +94,8 @@ public class JSONTest {
 			Assert.fail("Getting an attribute using the wrong class should throw an exception");
 		} catch (InvalidClassException ex) {}
 
-
 		// Check for property that has never been read
-		Set<String> neverVisited = jsonObject.getNeverVisited();
+		neverVisited = jsonObject.getNeverVisited();
 		Assert.assertNotNull("List of never visited attribute is null", neverVisited);
 		Assert.assertFalse("List of never visited attribute is empty", neverVisited.isEmpty());
 

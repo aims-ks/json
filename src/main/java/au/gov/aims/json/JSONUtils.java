@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InvalidClassException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -70,53 +71,56 @@ public class JSONUtils {
 	}
 
 	/**
-	 * Return true if "value" is an instance of "type", or equivalent.
-	 * Equivalent means that java will let the library cast "value" into "type".
-	 * Example:
-	 *   String value or value "null" is equivalent to any "type".
-	 *   Integer value is equivalent to Double.
+	 * Return the "value" in the requested "type".
+	 * If the value can't be converted to the resquested type, a InvalidClassException is thrown.
 	 */
-	public static boolean isInstanceOf(Object value, Class type) {
+	public static <T> T toType(Object value, Class<T> type) throws InvalidClassException {
 		// Null can be any type
 		if (value == null) {
-			return true;
+			return null;
 		}
 
 		// Equivalent to:
 		//   value instanceof type
 		if (type.isInstance(value)) {
-			return true;
+			return (T)value;
 		}
 
 		// Type equivalence
 
 		// Everything can be cast as a String
 		if (String.class.equals(type)) {
-			return true;
+			return (T)value;
 		}
 
 		if (Double.class.equals(type)) {
 			// Integer can be cast as Double
 			if (value instanceof Integer) {
-				return true;
+				Integer intValue = (Integer)value;
+				return (T)new Double(intValue.doubleValue());
 			}
 			// Float can be cast as Double
 			if (value instanceof Float) {
-				return true;
+				Float floatValue = (Float)value;
+				return (T)new Double(floatValue.doubleValue());
 			}
 		}
 
 		if (Float.class.equals(type)) {
 			// Integer can be cast as Float
 			if (value instanceof Integer) {
-				return true;
+				Integer intValue = (Integer)value;
+				return (T)new Float(intValue.floatValue());
 			}
 			// Double can be cast as Float (most of the time)
 			if (value instanceof Double) {
-				return true;
+				Double doubleValue = (Double)value;
+				return (T)new Float(doubleValue.floatValue());
 			}
 		}
 
-		return false;
+		throw new InvalidClassException("Object '" + value.toString() + "' " +
+				"of class '" + value.getClass().getName() + "' " +
+				"can not be convert into '" + type.getName() + "'");
 	}
 }

@@ -74,23 +74,30 @@ public abstract class JSONAbstract<K> {
 				}
 			}
 
-		} else if (JSONUtils.isInstanceOf(rawValue, type)) {
-			// Increase visit count
-			if (this.visitCount.containsKey(key)) {
-				Object count = this.visitCount.get(key);
-				if (count instanceof Integer) {
-					this.visitCount.put(key, ((Integer)count + 1));
-				}
-			} else {
-				this.visitCount.put(key, 1);
-			}
+		} else {
 
-			return (T)rawValue;
+			try {
+				T value = JSONUtils.toType(rawValue, type);
+
+				// Increase visit count (only if the value was retrieved without crashing)
+				if (this.visitCount.containsKey(key)) {
+					Object count = this.visitCount.get(key);
+					if (count instanceof Integer) {
+						this.visitCount.put(key, ((Integer)count + 1));
+					}
+				} else {
+					this.visitCount.put(key, 1);
+				}
+
+				return value;
+			} catch(InvalidClassException cause) {
+				throw new InvalidClassException("Invalid attribute type. " +
+						"Expected type '" + type.getSimpleName() + "' for attribute " + currentPath + ". " +
+						"Found '" + rawValue.getClass().getName() + "'.");
+			}
 		}
 
-		throw new InvalidClassException("Invalid attribute type. " +
-				"Expected type '" + type.getSimpleName() + "' for attribute " + currentPath + ". " +
-				"Found '" + rawValue.getClass().getName() + "'.");
+		return null;
 	}
 
 	public Set<String> getNeverVisited() {
