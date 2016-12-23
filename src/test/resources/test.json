@@ -1,0 +1,35 @@
+{
+	// Test objects
+	"countries": {
+		"australia": {
+			"name": "Australia",
+			"capital": "Canberra",
+			"area": 7692024.1,
+			"population": 24305700
+		},
+		"canada": {
+			"name": "Canada",
+			"capital": "Ottawa",
+			"area": 9984670.0,
+			"population": 36443632
+		},
+		"usa": {
+			"name": "United States of America",
+			"capital": "Washington",
+			"area": 9833517,
+			"population": 324720797
+		},
+		"atlantis": {
+			"name": "Atlantis",
+			"capital": null,
+			"area": null,
+			"population": null
+		}
+	},
+
+	// Test arrays
+	"group": ["australia", "canada", "usa"],
+
+	// Test unread
+	"vanished": "atlantis"
+}
