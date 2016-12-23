@@ -36,7 +36,7 @@ public class JSONTest {
 		try {
 			jsonConfigStream = JSONTest.class.getClassLoader().getResourceAsStream(jsonFilePath);
 			String jsonConfigStr = JSONUtils.streamToString(jsonConfigStream);
-			jsonObject = new JSONObject(jsonConfigStr, jsonFilePath);
+			jsonObject = new JSONObject(jsonConfigStr);
 		} finally {
 			if (jsonConfigStream != null) {
 				try {

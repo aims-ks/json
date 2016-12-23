@@ -18,32 +18,21 @@
  */
 package au.gov.aims.json;
 
-import java.io.File;
 import java.io.InvalidClassException;
-import java.util.Collection;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class JSONObject extends JSONAbstract<String> {
 	private org.json.JSONObject jsonObject;
 
-	public JSONObject(String jsonObjectStr, File jsonFile) {
-		this(new org.json.JSONObject(jsonObjectStr), null, jsonFile.getAbsolutePath());
+	public JSONObject(String jsonObjectStr) {
+		this(new org.json.JSONObject(jsonObjectStr), null);
 	}
 
-	public JSONObject(String jsonObjectStr, String jsonFilePath) {
-		this(new org.json.JSONObject(jsonObjectStr), null, jsonFilePath);
+	public JSONObject(org.json.JSONObject jsonObject) {
+		this(jsonObject, null);
 	}
 
-	public JSONObject(org.json.JSONObject jsonObject, File jsonFile) {
-		this(jsonObject, null, jsonFile.getAbsolutePath());
-	}
-
-	public JSONObject(org.json.JSONObject jsonObject, String jsonFilePath) {
-		this(jsonObject, null, jsonFilePath);
-	}
-
-	protected JSONObject(org.json.JSONObject jsonObject, String path, String jsonFilePath) {
+	protected JSONObject(org.json.JSONObject jsonObject, String path) {
 		super(path);
 		this.jsonObject = jsonObject;
 	}
@@ -89,71 +78,9 @@ public class JSONObject extends JSONAbstract<String> {
 			throw new IllegalArgumentException("Illegal class 'org.json.JSONArray'. Use 'au.gov.aims.json.JSONArray' instead.");
 		}
 
-		//String currentPath = (this.path == null ? key : this.path + "." + key);
-
 		Object rawValue = this.jsonObject.opt(key);
 
 		return super.getValueAndCountVisit(type, key, rawValue);
-
-/*
-		if (org.json.JSONObject.NULL.equals(rawValue)) {
-			rawValue = null;
-		}
-
-		if (rawValue instanceof org.json.JSONObject) {
-			if (JSONObject.class.equals(type)) {
-				if (this.visitCount.containsKey(key)) {
-					Object wrapper = this.visitCount.get(key);
-					if (wrapper instanceof JSONObject) {
-						return (T)wrapper;
-					}
-				} else {
-					JSONObject wrapper = new JSONObject((org.json.JSONObject)rawValue, currentPath);
-					this.visitCount.put(key, wrapper);
-					return (T)wrapper;
-				}
-			}
-
-		} else if (rawValue instanceof org.json.JSONArray) {
-			if (JSONArray.class.equals(type)) {
-				if (this.visitCount.containsKey(key)) {
-					Object wrapper = this.visitCount.get(key);
-					if (wrapper instanceof JSONArray) {
-						return (T)wrapper;
-					}
-				} else {
-					JSONArray wrapper = new JSONArray((org.json.JSONArray)rawValue, currentPath);
-					this.visitCount.put(key, wrapper);
-					return (T)wrapper;
-				}
-			}
-
-		} else if (JSONUtils.isInstanceOf(rawValue, type)) {
-			// Increase visit count
-			if (this.visitCount.containsKey(key)) {
-				Object count = this.visitCount.get(key);
-				if (count instanceof Integer) {
-					this.visitCount.put(key, ((Integer)count + 1));
-				}
-			} else {
-				this.visitCount.put(key, new Integer(1));
-			}
-
-			return (T)rawValue;
-		}
-
-		// Do not display "JSONObjectWrapper" or "JSONArrayWrapper". It's confusing.
-		String typeName = type.getSimpleName();
-		if (type.equals(JSONObject.class)) {
-			typeName = "JSONObject";
-		} else if (type.equals(JSONArray.class)) {
-			typeName = "JSONArray";
-		}
-
-		throw new InvalidClassException("Invalid attribute type. " +
-				"Expected type '" + typeName + "' for attribute " + currentPath + ". " +
-				"Found '" + rawValue.getClass().getName() + "'.");
-*/
 	}
 
 	@Override
