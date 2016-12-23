@@ -111,6 +111,10 @@ public class JSONUtils {
 			if (value instanceof Integer) {
 				return true;
 			}
+			// Double can be cast as Float (most of the time)
+			if (value instanceof Double) {
+				return true;
+			}
 		}
 
 		return false;

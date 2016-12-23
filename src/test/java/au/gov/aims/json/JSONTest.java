@@ -59,7 +59,7 @@ public class JSONTest {
 			JSONObject country = countries.get(JSONObject.class, countryId);
 			country.get(String.class, "name");
 			country.get(String.class, "capital");
-			country.get(Double.class, "area");
+			country.get(Float.class, "area");
 			country.get(Integer.class, "population");
 		}
 
