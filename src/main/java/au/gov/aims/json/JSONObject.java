@@ -18,7 +18,6 @@
  */
 package au.gov.aims.json;
 
-import java.io.InvalidClassException;
 import java.util.Set;
 
 public class JSONObject extends JSONAbstract<String> {
@@ -62,11 +61,11 @@ public class JSONObject extends JSONAbstract<String> {
 		return valueClass;
 	}
 
-	public <T> T get(Class<T> type, String key, T defaultValue) throws InvalidClassException {
+	public <T> T get(Class<T> type, String key, T defaultValue) throws InvalidJSONException {
 		T value = this.get(type, key);
 		return (value == null ? defaultValue : value);
 	}
-	public <T> T get(Class<T> type, String key) throws InvalidClassException {
+	public <T> T get(Class<T> type, String key) throws InvalidJSONException {
 		if (!this.jsonObject.has(key)) {
 			return null;
 		}

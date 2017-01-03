@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.InputStream;
-import java.io.InvalidClassException;
 import java.util.Set;
 
 public class JSONTest {
@@ -92,7 +91,7 @@ public class JSONTest {
 		try {
 			jsonObject.get(JSONObject.class, "vanished");
 			Assert.fail("Getting an attribute using the wrong class should throw an exception");
-		} catch (InvalidClassException ex) {}
+		} catch (InvalidJSONException ex) {}
 
 		// Check for property that has never been read
 		neverVisited = jsonObject.getNeverVisited();

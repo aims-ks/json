@@ -18,7 +18,6 @@
  */
 package au.gov.aims.json;
 
-import java.io.InvalidClassException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -59,11 +58,11 @@ public class JSONArray extends JSONAbstract<Integer> {
 		return valueClass;
 	}
 
-	public <T> T get(Class<T> type, int index, T defaultValue) throws InvalidClassException {
+	public <T> T get(Class<T> type, int index, T defaultValue) throws InvalidJSONException {
 		T value = this.get(type, index);
 		return (value == null ? defaultValue : value);
 	}
-	public <T> T get(Class<T> type, int index) throws InvalidClassException {
+	public <T> T get(Class<T> type, int index) throws InvalidJSONException {
 		if (index < 0 || this.jsonArray.length()-1 < index) {
 			return null;
 		}

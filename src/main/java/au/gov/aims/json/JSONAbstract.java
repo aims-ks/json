@@ -39,7 +39,7 @@ public abstract class JSONAbstract<K> {
 		this.visitCount = new HashMap<K, Object>();
 	}
 
-	protected <T> T getValueAndCountVisit(Class<T> type, K key, Object rawValue) throws InvalidClassException {
+	protected <T> T getValueAndCountVisit(Class<T> type, K key, Object rawValue) throws InvalidJSONException {
 		if (org.json.JSONObject.NULL.equals(rawValue)) {
 			rawValue = null;
 		}
@@ -91,9 +91,9 @@ public abstract class JSONAbstract<K> {
 
 				return value;
 			} catch(InvalidClassException cause) {
-				throw new InvalidClassException("Invalid attribute type. " +
+				throw new InvalidJSONException("Invalid attribute type. " +
 						"Expected type '" + type.getSimpleName() + "' for attribute " + currentPath + ". " +
-						"Found '" + rawValue.getClass().getName() + "'.");
+						"Found '" + rawValue.getClass().getName() + "'.", cause);
 			}
 		}
 
