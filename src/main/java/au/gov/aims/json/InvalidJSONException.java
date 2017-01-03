@@ -20,12 +20,14 @@ package au.gov.aims.json;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class InvalidJSONException extends IOException {
-	private File jsonFile;
+	private List<File> jsonFiles;
 	private Set<String> neverVisited;
 
 	public InvalidJSONException(String message) {
@@ -39,16 +41,17 @@ public class InvalidJSONException extends IOException {
 	}
 
 	private void init() {
+		this.jsonFiles = new ArrayList<File>();
 		this.neverVisited = new TreeSet<String>();
 	}
 
 
-	public File getJSONFile() {
-		return this.jsonFile;
+	public List<File> getJSONFiles() {
+		return this.jsonFiles;
 	}
 
-	public void setJSONFile(File jsonFile) {
-		this.jsonFile = jsonFile;
+	public void addJSONFile(File jsonFile) {
+		this.jsonFiles.add(jsonFile);
 	}
 
 	public void addNeverVisited(String neverVisitedElement) {
@@ -68,8 +71,24 @@ public class InvalidJSONException extends IOException {
 	public String getMessage() {
 		StringBuilder msgSb = new StringBuilder(super.getMessage());
 
-		if (this.jsonFile != null) {
-			msgSb.append(System.lineSeparator()).append("JSON file: ").append(this.jsonFile.getAbsolutePath());
+		if (this.jsonFiles.isEmpty()) {
+			msgSb.append(System.lineSeparator());
+
+			if (this.jsonFiles.size() > 1) {
+				msgSb.append("JSON files: ");
+			} else {
+				msgSb.append("JSON file: ");
+			}
+
+			boolean firstFile = true;
+			for (File jsonFile : this.jsonFiles) {
+				if (firstFile) {
+					firstFile = false;
+				} else {
+					msgSb.append(", ");
+				}
+				msgSb.append(jsonFile.getAbsolutePath());
+			}
 		}
 
 		if (this.neverVisited != null && !this.neverVisited.isEmpty()) {
