@@ -71,7 +71,7 @@ public class InvalidJSONException extends IOException {
 	public String getMessage() {
 		StringBuilder msgSb = new StringBuilder(super.getMessage());
 
-		if (this.jsonFiles.isEmpty()) {
+		if (!this.jsonFiles.isEmpty()) {
 			msgSb.append(System.lineSeparator());
 
 			if (this.jsonFiles.size() > 1) {
