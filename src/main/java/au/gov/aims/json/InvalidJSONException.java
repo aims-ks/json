@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class InvalidJSONException extends IOException {
-	private File configurationFile;
+	private File jsonFile;
 	private Set<String> neverVisited;
 
 	public InvalidJSONException(String message) {
@@ -43,12 +43,12 @@ public class InvalidJSONException extends IOException {
 	}
 
 
-	public File getConfigurationFile() {
-		return this.configurationFile;
+	public File getJSONFile() {
+		return this.jsonFile;
 	}
 
-	public void setConfigurationFile(File configurationFile) {
-		this.configurationFile = configurationFile;
+	public void setJSONFile(File jsonFile) {
+		this.jsonFile = jsonFile;
 	}
 
 	public void addNeverVisited(String neverVisitedElement) {
@@ -68,8 +68,8 @@ public class InvalidJSONException extends IOException {
 	public String getMessage() {
 		StringBuilder msgSb = new StringBuilder(super.getMessage());
 
-		if (this.configurationFile != null) {
-			msgSb.append(System.lineSeparator()).append("Configuration file: ").append(this.configurationFile.getAbsolutePath());
+		if (this.jsonFile != null) {
+			msgSb.append(System.lineSeparator()).append("JSON file: ").append(this.jsonFile.getAbsolutePath());
 		}
 
 		if (this.neverVisited != null && !this.neverVisited.isEmpty()) {
