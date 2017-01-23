@@ -19,10 +19,13 @@
 package au.gov.aims.json;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InvalidClassException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -68,6 +71,33 @@ public class JSONUtils {
 			}
 		}
 		return sb.toString();
+	}
+
+	public static void write(org.json.JSONObject json, File file) throws IOException {
+		JSONUtils.write(json, file, -1);
+	}
+
+	public static void write(org.json.JSONObject json, File file, int indentFactor) throws IOException {
+		if (file == null) {
+			throw new IOException("Can not save video metadata; file is null");
+		}
+		if (json == null) {
+			throw new IOException("Can not save video metadata to '" + file.getAbsolutePath() + "'; JSON is null");
+		}
+
+		Writer writer = null;
+		try {
+			writer = new FileWriter(file);
+			if (indentFactor > 0) {
+				json.write(writer, indentFactor, 0);
+			} else {
+				json.write(writer);
+			}
+		} finally {
+			if (writer != null) {
+				writer.close();
+			}
+		}
 	}
 
 	/**
