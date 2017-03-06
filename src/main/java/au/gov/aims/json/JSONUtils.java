@@ -74,25 +74,55 @@ public class JSONUtils {
 	}
 
 	public static void write(org.json.JSONObject json, File file) throws IOException {
-		JSONUtils.write(json, file, -1);
+		JSONUtils.internalWrite(json, file, -1);
 	}
 
 	public static void write(org.json.JSONObject json, File file, int indentFactor) throws IOException {
+		JSONUtils.internalWrite(json, file, indentFactor);
+	}
+
+	public static void write(org.json.JSONArray json, File file) throws IOException {
+		JSONUtils.internalWrite(json, file, -1);
+	}
+
+	public static void write(org.json.JSONArray json, File file, int indentFactor) throws IOException {
+		JSONUtils.internalWrite(json, file, indentFactor);
+	}
+
+	private static void internalWrite(Object json, File file, int indentFactor) throws IOException {
 		if (file == null) {
-			throw new IOException("Can not save video metadata; file is null");
+			throw new IOException("Can not save JSON; file is null");
 		}
 		if (json == null) {
-			throw new IOException("Can not save video metadata to '" + file.getAbsolutePath() + "'; JSON is null");
+			throw new IOException("Can not save JSON to '" + file.getAbsolutePath() + "'; JSON is null");
 		}
 
 		Writer writer = null;
 		try {
 			writer = new FileWriter(file);
-			if (indentFactor > 0) {
-				json.write(writer, indentFactor, 0);
+
+			if (json instanceof org.json.JSONObject) {
+				// JSONObject
+				org.json.JSONObject jsonObject = (org.json.JSONObject)json;
+				if (indentFactor > 0) {
+					jsonObject.write(writer, indentFactor, 0);
+				} else {
+					jsonObject.write(writer);
+				}
+
+			} else if (json instanceof org.json.JSONArray) {
+				// JSONArray
+				org.json.JSONArray jsonArray = (org.json.JSONArray)json;
+				if (indentFactor > 0) {
+					jsonArray.write(writer, indentFactor, 0);
+				} else {
+					jsonArray.write(writer);
+				}
+
 			} else {
-				json.write(writer);
+				throw new IOException("Can not save JSON to '" + file.getAbsolutePath() + "'; JSON is not a JSONObject or a JSONArray");
 			}
+
 		} finally {
 			if (writer != null) {
 				writer.close();
