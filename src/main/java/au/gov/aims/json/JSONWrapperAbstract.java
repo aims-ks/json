@@ -34,8 +34,8 @@ public abstract class JSONWrapperAbstract<K> {
     // Map of <String (key), Object>
     // where Object is one of:
     // * Integer: Counter for the number of visit
-    // * JSONWrapperObject: JSON data structure
-    // * JSONWrapperArray: JSON data structure
+    // * JSONWrapperObject: JSON data structure (pointer to a child JSONWrapperObject)
+    // * JSONWrapperArray: JSON data structure (pointer to a child JSONWrapperArray)
     private Map<K, Object> visitCount;
 
     public JSONWrapperAbstract(String path) {
