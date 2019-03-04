@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Australian Institute of Marine Science
+ *  Copyright (C) 2019 Australian Institute of Marine Science
  *
  *  Contact: Gael Lafond <g.lafond@aims.org.au>
  *
@@ -18,6 +18,9 @@
  */
 package au.gov.aims.json;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,157 +33,157 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class JSONUtils {
-	private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
+    private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
 
-	public static String streamToString(InputStream inputStream) throws IOException {
-		return JSONUtils.streamToString(inputStream, DEFAULT_ENCODING, true);
-	}
+    public static String streamToString(InputStream inputStream) throws IOException {
+        return JSONUtils.streamToString(inputStream, DEFAULT_ENCODING, true);
+    }
 
-	public static String streamToString(InputStream inputStream, boolean removeComments) throws IOException {
-		return JSONUtils.streamToString(inputStream, DEFAULT_ENCODING, removeComments);
-	}
+    public static String streamToString(InputStream inputStream, boolean removeComments) throws IOException {
+        return JSONUtils.streamToString(inputStream, DEFAULT_ENCODING, removeComments);
+    }
 
-	/**
-	 * Read a file into a String.
-	 * See: http://stackoverflow.com/questions/326390/how-to-create-a-java-string-from-the-contents-of-a-file#326440
-	 * @param inputStream
-	 * @param encoding
-	 * @return
-	 * @throws IOException
-	 */
-	public static String streamToString(InputStream inputStream, Charset encoding, boolean removeComments) throws IOException {
-		if (inputStream == null) {
-			return null;
-		}
+    /**
+     * Read a file into a String.
+     * See: http://stackoverflow.com/questions/326390/how-to-create-a-java-string-from-the-contents-of-a-file#326440
+     * @param inputStream
+     * @param encoding
+     * @return
+     * @throws IOException
+     */
+    public static String streamToString(InputStream inputStream, Charset encoding, boolean removeComments) throws IOException {
+        if (inputStream == null) {
+            return null;
+        }
 
-		StringBuilder sb = new StringBuilder();
-		BufferedReader bufferedReader = null;
+        StringBuilder sb = new StringBuilder();
+        BufferedReader bufferedReader = null;
 
-		try {
-			bufferedReader = new BufferedReader(new InputStreamReader(inputStream, encoding));
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream, encoding));
 
-			String line;
-			while ((line = bufferedReader.readLine()) != null) {
-				if (!removeComments || !line.trim().startsWith("//")) {
-					sb.append(line).append("\n");
-				}
-			}
-		} finally {
-			if (bufferedReader != null) {
-				bufferedReader.close();
-			}
-		}
-		return sb.toString();
-	}
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if (!removeComments || !line.trim().startsWith("//")) {
+                    sb.append(line).append("\n");
+                }
+            }
+        } finally {
+            if (bufferedReader != null) {
+                bufferedReader.close();
+            }
+        }
+        return sb.toString();
+    }
 
-	public static void write(org.json.JSONObject json, File file) throws IOException {
-		JSONUtils.internalWrite(json, file, -1);
-	}
+    public static void write(JSONObject json, File file) throws IOException {
+        JSONUtils.internalWrite(json, file, -1);
+    }
 
-	public static void write(org.json.JSONObject json, File file, int indentFactor) throws IOException {
-		JSONUtils.internalWrite(json, file, indentFactor);
-	}
+    public static void write(JSONObject json, File file, int indentFactor) throws IOException {
+        JSONUtils.internalWrite(json, file, indentFactor);
+    }
 
-	public static void write(org.json.JSONArray json, File file) throws IOException {
-		JSONUtils.internalWrite(json, file, -1);
-	}
+    public static void write(JSONArray json, File file) throws IOException {
+        JSONUtils.internalWrite(json, file, -1);
+    }
 
-	public static void write(org.json.JSONArray json, File file, int indentFactor) throws IOException {
-		JSONUtils.internalWrite(json, file, indentFactor);
-	}
+    public static void write(JSONArray json, File file, int indentFactor) throws IOException {
+        JSONUtils.internalWrite(json, file, indentFactor);
+    }
 
-	private static void internalWrite(Object json, File file, int indentFactor) throws IOException {
-		if (file == null) {
-			throw new IOException("Can not save JSON; file is null");
-		}
-		if (json == null) {
-			throw new IOException("Can not save JSON to '" + file.getAbsolutePath() + "'; JSON is null");
-		}
+    private static void internalWrite(Object json, File file, int indentFactor) throws IOException {
+        if (file == null) {
+            throw new IOException("Can not save JSON; file is null");
+        }
+        if (json == null) {
+            throw new IOException("Can not save JSON to '" + file.getAbsolutePath() + "'; JSON is null");
+        }
 
-		Writer writer = null;
-		try {
-			writer = new FileWriter(file);
+        Writer writer = null;
+        try {
+            writer = new FileWriter(file);
 
-			if (json instanceof org.json.JSONObject) {
-				// JSONObject
-				org.json.JSONObject jsonObject = (org.json.JSONObject)json;
-				if (indentFactor > 0) {
-					jsonObject.write(writer, indentFactor, 0);
-				} else {
-					jsonObject.write(writer);
-				}
+            if (json instanceof JSONObject) {
+                // JSONObject
+                JSONObject jsonObject = (JSONObject)json;
+                if (indentFactor > 0) {
+                    jsonObject.write(writer, indentFactor, 0);
+                } else {
+                    jsonObject.write(writer);
+                }
 
-			} else if (json instanceof org.json.JSONArray) {
-				// JSONArray
-				org.json.JSONArray jsonArray = (org.json.JSONArray)json;
-				if (indentFactor > 0) {
-					jsonArray.write(writer, indentFactor, 0);
-				} else {
-					jsonArray.write(writer);
-				}
+            } else if (json instanceof JSONArray) {
+                // JSONArray
+                JSONArray jsonArray = (JSONArray)json;
+                if (indentFactor > 0) {
+                    jsonArray.write(writer, indentFactor, 0);
+                } else {
+                    jsonArray.write(writer);
+                }
 
-			} else {
-				throw new IOException("Can not save JSON to '" + file.getAbsolutePath() + "'; JSON is not a JSONObject or a JSONArray");
-			}
+            } else {
+                throw new IOException("Can not save JSON to '" + file.getAbsolutePath() + "'; JSON is not a JSONObject or a JSONArray");
+            }
 
-		} finally {
-			if (writer != null) {
-				writer.close();
-			}
-		}
-	}
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
 
-	/**
-	 * Return the "value" in the requested "type".
-	 * If the value can't be converted to the resquested type, a InvalidClassException is thrown.
-	 */
-	public static <T> T toType(Object value, Class<T> type) throws InvalidClassException {
-		// Null can be any type
-		if (value == null) {
-			return null;
-		}
+    /**
+     * Return the "value" in the requested "type".
+     * If the value can't be converted to the resquested type, a InvalidClassException is thrown.
+     */
+    public static <T> T toType(Object value, Class<T> type) throws InvalidClassException {
+        // Null can be any type
+        if (value == null) {
+            return null;
+        }
 
-		// Equivalent to:
-		//   value instanceof type
-		if (type.isInstance(value)) {
-			return (T)value;
-		}
+        // Equivalent to:
+        //   value instanceof type
+        if (type.isInstance(value)) {
+            return (T)value;
+        }
 
-		// Type equivalence
+        // Type equivalence
 
-		// Everything can be cast as a String
-		if (String.class.equals(type)) {
-			return (T)value;
-		}
+        // Everything can be cast as a String
+        if (String.class.equals(type)) {
+            return (T)value;
+        }
 
-		if (Double.class.equals(type)) {
-			// Integer can be cast as Double
-			if (value instanceof Integer) {
-				Integer intValue = (Integer)value;
-				return (T)new Double(intValue.doubleValue());
-			}
-			// Float can be cast as Double
-			if (value instanceof Float) {
-				Float floatValue = (Float)value;
-				return (T)new Double(floatValue.doubleValue());
-			}
-		}
+        if (Double.class.equals(type)) {
+            // Integer can be cast as Double
+            if (value instanceof Integer) {
+                Integer intValue = (Integer)value;
+                return (T)new Double(intValue.doubleValue());
+            }
+            // Float can be cast as Double
+            if (value instanceof Float) {
+                Float floatValue = (Float)value;
+                return (T)new Double(floatValue.doubleValue());
+            }
+        }
 
-		if (Float.class.equals(type)) {
-			// Integer can be cast as Float
-			if (value instanceof Integer) {
-				Integer intValue = (Integer)value;
-				return (T)new Float(intValue.floatValue());
-			}
-			// Double can be cast as Float (most of the time)
-			if (value instanceof Double) {
-				Double doubleValue = (Double)value;
-				return (T)new Float(doubleValue.floatValue());
-			}
-		}
+        if (Float.class.equals(type)) {
+            // Integer can be cast as Float
+            if (value instanceof Integer) {
+                Integer intValue = (Integer)value;
+                return (T)new Float(intValue.floatValue());
+            }
+            // Double can be cast as Float (most of the time)
+            if (value instanceof Double) {
+                Double doubleValue = (Double)value;
+                return (T)new Float(doubleValue.floatValue());
+            }
+        }
 
-		throw new InvalidClassException("Object '" + value.toString() + "' " +
-				"of class '" + value.getClass().getName() + "' " +
-				"can not be convert into '" + type.getName() + "'");
-	}
+        throw new InvalidClassException("Object '" + value.toString() + "' " +
+                "of class '" + value.getClass().getName() + "' " +
+                "can not be convert into '" + type.getName() + "'");
+    }
 }

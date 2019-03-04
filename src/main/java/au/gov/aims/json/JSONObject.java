@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Australian Institute of Marine Science
+ *  Copyright (C) 2019 Australian Institute of Marine Science
  *
  *  Contact: Gael Lafond <g.lafond@aims.org.au>
  *
@@ -18,77 +18,27 @@
  */
 package au.gov.aims.json;
 
-import java.util.Set;
+/**
+ * @deprecated Use JSONWrapperObject
+ */
+@Deprecated
+public class JSONObject extends JSONWrapperObject {
 
-public class JSONObject extends JSONAbstract<String> {
-	private org.json.JSONObject jsonObject;
+    /**
+     * @param jsonObjectStr
+     * @deprecated Use JSONWrapperObject
+     */
+    @Deprecated
+    public JSONObject(String jsonObjectStr) {
+        super(jsonObjectStr);
+    }
 
-	public JSONObject(String jsonObjectStr) {
-		this(new org.json.JSONObject(jsonObjectStr), null);
-	}
-
-	public JSONObject(org.json.JSONObject jsonObject) {
-		this(jsonObject, null);
-	}
-
-	protected JSONObject(org.json.JSONObject jsonObject, String path) {
-		super(path);
-		this.jsonObject = jsonObject;
-	}
-
-	@Override
-	public Set<String> keySet() {
-		return this.jsonObject.keySet();
-	}
-
-	public boolean has(String key) {
-		return this.jsonObject.has(key);
-	}
-
-	public Class getClass(String key) {
-		if (!this.jsonObject.has(key)) {
-			return null;
-		}
-
-		Class valueClass = this.jsonObject.opt(key).getClass();
-		if (org.json.JSONObject.class.equals(valueClass)) {
-			return JSONObject.class;
-		}
-		if (org.json.JSONArray.class.equals(valueClass)) {
-			return JSONArray.class;
-		}
-
-		return valueClass;
-	}
-
-	public <T> T get(Class<T> type, String key, T defaultValue) throws InvalidJSONException {
-		T value = this.get(type, key);
-		return (value == null ? defaultValue : value);
-	}
-	public <T> T get(Class<T> type, String key) throws InvalidJSONException {
-		if (!this.jsonObject.has(key)) {
-			return null;
-		}
-
-		if (org.json.JSONObject.class.equals(type)) {
-			throw new IllegalArgumentException("Illegal class 'org.json.JSONObject'. Use 'au.gov.aims.json.JSONObject' instead.");
-		}
-		if (org.json.JSONArray.class.equals(type)) {
-			throw new IllegalArgumentException("Illegal class 'org.json.JSONArray'. Use 'au.gov.aims.json.JSONArray' instead.");
-		}
-
-		Object rawValue = this.jsonObject.opt(key);
-
-		return super.getValueAndCountVisit(type, key, rawValue);
-	}
-
-	@Override
-	public String toString() {
-		return this.jsonObject.toString();
-	}
-
-	@Override
-	public String toString(int indentFactor) {
-		return this.jsonObject.toString(indentFactor);
-	}
+    /**
+     * @param jsonObject
+     * @deprecated Use JSONWrapperObject
+     */
+    @Deprecated
+    public JSONObject(org.json.JSONObject jsonObject) {
+        super(jsonObject);
+    }
 }

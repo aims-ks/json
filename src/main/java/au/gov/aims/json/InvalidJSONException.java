@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2016 Australian Institute of Marine Science
+ *  Copyright (C) 2019 Australian Institute of Marine Science
  *
  *  Contact: Gael Lafond <g.lafond@aims.org.au>
  *
@@ -27,76 +27,76 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class InvalidJSONException extends IOException {
-	private List<File> jsonFiles;
-	private Set<String> neverVisited;
+    private List<File> jsonFiles;
+    private Set<String> neverVisited;
 
-	public InvalidJSONException(String message) {
-		super(message);
-		this.init();
-	}
+    public InvalidJSONException(String message) {
+        super(message);
+        this.init();
+    }
 
-	public InvalidJSONException(String message, Throwable cause) {
-		super(message, cause);
-		this.init();
-	}
+    public InvalidJSONException(String message, Throwable cause) {
+        super(message, cause);
+        this.init();
+    }
 
-	private void init() {
-		this.jsonFiles = new ArrayList<File>();
-		this.neverVisited = new TreeSet<String>();
-	}
-
-
-	public List<File> getJSONFiles() {
-		return this.jsonFiles;
-	}
-
-	public void addJSONFile(File jsonFile) {
-		this.jsonFiles.add(jsonFile);
-	}
-
-	public void addNeverVisited(String neverVisitedElement) {
-		this.neverVisited.add(neverVisitedElement);
-	}
-
-	public void addAllNeverVisited(Collection<String> neverVisitedElements) {
-		this.neverVisited.addAll(neverVisitedElements);
-	}
-
-	public Set<String> getNeverVisited() {
-		return this.neverVisited;
-	}
+    private void init() {
+        this.jsonFiles = new ArrayList<File>();
+        this.neverVisited = new TreeSet<String>();
+    }
 
 
-	@Override
-	public String getMessage() {
-		StringBuilder msgSb = new StringBuilder(super.getMessage());
+    public List<File> getJSONFiles() {
+        return this.jsonFiles;
+    }
 
-		if (!this.jsonFiles.isEmpty()) {
-			msgSb.append(System.lineSeparator());
+    public void addJSONFile(File jsonFile) {
+        this.jsonFiles.add(jsonFile);
+    }
 
-			if (this.jsonFiles.size() > 1) {
-				msgSb.append("JSON files: ");
-			} else {
-				msgSb.append("JSON file: ");
-			}
+    public void addNeverVisited(String neverVisitedElement) {
+        this.neverVisited.add(neverVisitedElement);
+    }
 
-			boolean firstFile = true;
-			for (File jsonFile : this.jsonFiles) {
-				if (firstFile) {
-					firstFile = false;
-				} else {
-					msgSb.append(", ");
-				}
-				msgSb.append(jsonFile.getAbsolutePath());
-			}
-		}
+    public void addAllNeverVisited(Collection<String> neverVisitedElements) {
+        this.neverVisited.addAll(neverVisitedElements);
+    }
 
-		if (this.neverVisited != null && !this.neverVisited.isEmpty()) {
-			for (String neverVisitedElement : this.neverVisited) {
-				msgSb.append(System.lineSeparator()).append("Invalid attribute: ").append(neverVisitedElement);
-			}
-		}
+    public Set<String> getNeverVisited() {
+        return this.neverVisited;
+    }
 
-		return msgSb.toString();
-	}
+
+    @Override
+    public String getMessage() {
+        StringBuilder msgSb = new StringBuilder(super.getMessage());
+
+        if (!this.jsonFiles.isEmpty()) {
+            msgSb.append(System.lineSeparator());
+
+            if (this.jsonFiles.size() > 1) {
+                msgSb.append("JSON files: ");
+            } else {
+                msgSb.append("JSON file: ");
+            }
+
+            boolean firstFile = true;
+            for (File jsonFile : this.jsonFiles) {
+                if (firstFile) {
+                    firstFile = false;
+                } else {
+                    msgSb.append(", ");
+                }
+                msgSb.append(jsonFile.getAbsolutePath());
+            }
+        }
+
+        if (this.neverVisited != null && !this.neverVisited.isEmpty()) {
+            for (String neverVisitedElement : this.neverVisited) {
+                msgSb.append(System.lineSeparator()).append("Invalid attribute: ").append(neverVisitedElement);
+            }
+        }
+
+        return msgSb.toString();
+    }
 }
