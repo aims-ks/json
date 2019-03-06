@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public abstract class JSONWrapperAbstract<K> {
-    private String path;
+    protected String path;
 
     // Map of <String (key), Object>
     // where Object is one of:

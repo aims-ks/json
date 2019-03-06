@@ -85,6 +85,29 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
         return super.getValueAndCountVisit(type, key, rawValue);
     }
 
+    /**
+     * Returns a new {@link JSONWrapperObject} representing the current object (this) overwritten with
+     * the values from the overwrites parameter.
+     * Both the current object (this) and the overwrites parameter are unmodified.
+     * @param overwrites
+     * @return
+     */
+    public JSONWrapperObject overwrite(JSONWrapperObject overwrites) {
+        return new JSONWrapperObject(
+            JSONUtils.overwrites(this.jsonObject, overwrites.jsonObject),
+            super.path
+        );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof JSONWrapperObject)) {
+            return false;
+        }
+
+        return JSONUtils.equals(this.jsonObject, ((JSONWrapperObject)obj).jsonObject);
+    }
+
     @Override
     public String toString() {
         return this.jsonObject.toString();

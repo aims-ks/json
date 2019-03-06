@@ -93,6 +93,15 @@ public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof JSONWrapperArray)) {
+            return false;
+        }
+
+        return JSONUtils.equals(this.jsonArray, ((JSONWrapperArray)obj).jsonArray);
+    }
+
+    @Override
     public String toString() {
         return this.jsonArray.toString();
     }
