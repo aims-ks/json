@@ -31,6 +31,8 @@ import java.io.InvalidClassException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class JSONUtils {
@@ -286,11 +288,17 @@ public class JSONUtils {
     }
 
     /**
+     * Same as {@link #overwrite(JSONObject, JSONObject, String)} with array merge disabled.
+     * @param base
+     * @param overwrites
+     * @return
+     */
+    public static JSONObject overwrite(JSONObject base, JSONObject overwrites) {
+        return JSONUtils.overwrite(base, overwrites, null);
+    }
+
+    /**
      * Overwrites the values of parameter base with the values of parameter overwrites.
-     * This is not a merge, it replace arrays instead of attempting to merge their values.
-     * NOTE: It would be nearly impossible to instruct the overwrites to reorder the array and/or remove an element
-     *   from a JSONArray from the base (matching indexes is a terribly bad idea), therefor this method simply
-     *   replace JSONArray from the base with the JSONArray in the overwrites.
      *
      * Example:
      *   JSONObject base = new JSONObject()
@@ -323,9 +331,11 @@ public class JSONUtils {
      *   NOTE: This parameter is safe, it won't be modified by this method.
      * @param overwrites The values that will be used to overwrite the base.
      *   NOTE: This parameter is safe, it won't be modified by this method.
+     * @param idKey The property to use when merging arrays. If set to null, arrays are replaced with the one
+     *   found in overwrites, if any.
      * @return A new JSONObject representing the base overwritten with the values from the overwrites parameter.
      */
-    public static JSONObject overwrites(JSONObject base, JSONObject overwrites) {
+    public static JSONObject overwrite(JSONObject base, JSONObject overwrites, String idKey) {
         if (base == null) {
             return JSONUtils.copy(overwrites);
         }
@@ -335,10 +345,14 @@ public class JSONUtils {
 
         JSONObject copy = JSONUtils.copy(base);
 
-        return recursiveOverwrites(copy, overwrites);
+        return recursiveOverwrite(copy, overwrites, idKey);
     }
 
-    private static JSONObject recursiveOverwrites(JSONObject base, JSONObject overwrites) {
+    /**
+     * Unsafe version of {@link #overwrite(JSONObject, JSONObject, String)}
+     * (it may modify the input parameters)
+     */
+    private static JSONObject recursiveOverwrite(JSONObject base, JSONObject overwrites, String idKey) {
         Set<String> keys = overwrites.keySet();
         for (String key : keys) {
             Object value = overwrites.get(key);
@@ -348,7 +362,14 @@ public class JSONUtils {
                 if (value instanceof JSONObject) {
                     JSONObject origValue = base.optJSONObject(key);
                     if (origValue != null) {
-                        value = JSONUtils.recursiveOverwrites(origValue, (JSONObject) value);
+                        value = JSONUtils.recursiveOverwrite(origValue, (JSONObject) value, idKey);
+                    }
+                } else if (value instanceof JSONArray) {
+                    if (idKey != null) {
+                        JSONArray origValue = base.optJSONArray(key);
+                        if (origValue != null) {
+                            value = JSONUtils.overwrite(origValue, (JSONArray) value, idKey);
+                        }
                     }
                 }
 
@@ -357,5 +378,78 @@ public class JSONUtils {
         }
 
         return base;
+    }
+
+    /**
+     * Return the overwrites array, after following the above instruction:
+     * For each element of the overwrites array
+     *   If the element is a JSONObject AND
+     *     it define the property "idKey" AND
+     *     there is a JSONObject element in the base JSONArray that define the same value for its property "idKey",
+     *   Over the JSONObject element from the base with the values from the matching JSONObject element
+     *     from the overwrites.
+     * The order of the elements is defined by the overwrites JSONArray.
+     * If an element is defined in the base but not in overwrites,
+     *   that element will not be present in the returned JSONArray.
+     * @param base JSONArray containing the values to overwrite.
+     * @param overwrites JSONArray containing the list of wanted elements, order and overwrites.
+     * @param idKey The JSONObject property name to look for when trying to match elements from the
+     *   overwrites JSONArray with elements from the base JSONArray. Only apply to elements of type JSONObject.
+     * @return A JSONArray containing the overwrites.
+     */
+    public static JSONArray overwrite(JSONArray base, JSONArray overwrites, String idKey) {
+        if (base == null) {
+            return overwrites;
+        }
+        if (overwrites == null) {
+            return base;
+        }
+        if (overwrites.isEmpty()) {
+            return overwrites;
+        }
+
+        if (idKey == null || idKey.isEmpty()) {
+            return overwrites;
+        }
+
+        // base, overwrites and idKey are not null
+
+        // Index all elements from the base which has an ID defined (only works if the element is JSONObject)
+        Map<String, JSONObject> baseIndex = new HashMap<String, JSONObject>();
+        for (int i=0; i<base.length(); i++) {
+            JSONObject jsonBaseEl = base.optJSONObject(i);
+            if (jsonBaseEl != null) {
+                String id = jsonBaseEl.optString(idKey, null);
+                if (id != null) {
+                    baseIndex.put(id, jsonBaseEl);
+                }
+            }
+        }
+
+        // Nothing to overwrite, simply return the overwrites array (to save processing time)
+        if (baseIndex.isEmpty()) {
+            return overwrites;
+        }
+
+        // Find overwrites which have IDs and overwrite base with them.
+        JSONArray overwrittenArray = new JSONArray();
+        for (int i=0; i<overwrites.length(); i++) {
+            Object value = overwrites.opt(i);
+            if (value instanceof JSONObject) {
+                JSONObject jsonValue = (JSONObject)value;
+                String id = jsonValue.optString(idKey, null);
+                if (id != null) {
+                    // Find the original element
+                    JSONObject origValue = baseIndex.get(id);
+                    if (origValue != null) {
+                        value = recursiveOverwrite(origValue, jsonValue, idKey);
+                    }
+                }
+            }
+
+            overwrittenArray.put(value);
+        }
+
+        return overwrittenArray;
     }
 }

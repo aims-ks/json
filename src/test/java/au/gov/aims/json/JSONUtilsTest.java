@@ -103,11 +103,11 @@ public class JSONUtilsTest {
                 .put("b")
                 .put("c"));
 
-        JSONObject result1 = JSONUtils.overwrites(jsonObject, null);
+        JSONObject result1 = JSONUtils.overwrite(jsonObject, null);
         Assert.assertNotNull("Overwriting a JSONObject with null returns null", result1);
         Assert.assertTrue("Overwriting a JSONObject with null returns unexpected results", JSONUtils.equals(jsonObject, result1));
 
-        JSONObject result2 = JSONUtils.overwrites(null, jsonObject);
+        JSONObject result2 = JSONUtils.overwrite(null, jsonObject);
         Assert.assertNotNull("Overwriting null with a JSONObject returns null", result2);
         Assert.assertTrue("Overwriting null with a JSONObject returns unexpected results", JSONUtils.equals(jsonObject, result2));
     }
@@ -140,7 +140,7 @@ public class JSONUtilsTest {
                 .put("a")
                 .put("d"));
 
-        JSONObject result = JSONUtils.overwrites(base, overwrites);
+        JSONObject result = JSONUtils.overwrite(base, overwrites);
 
         //System.out.println("Expected: " + expected.toString(4));
         //System.out.println("Found: " + result.toString(4));
@@ -169,5 +169,90 @@ public class JSONUtilsTest {
         Assert.assertNotEquals("Base and result are the same, the overwrite method has modified its input", base, result);
 
         Assert.assertTrue("Result is not as expected according to JSONUtils.equals()", JSONUtils.equals(expected, result));
+    }
+
+    @Test
+    public void testArrayOverwrite() {
+        JSONArray base = new JSONArray()
+            .put("a")
+            .put(new JSONObject()
+                .put("id", "id_b")
+                .put("newId", "nid_b")
+                .put("base", "baseValue")
+                .put("value", "b"))
+            .put(new JSONObject()
+                .put("id", "id_c")
+                .put("newId", "nid_c")
+                .put("value", "c"))
+            .put(new JSONObject()
+                .put("id", "id_d")
+                .put("newId", "nid_d")
+                .put("value", "d"))
+            .put("e")
+            .put(new JSONObject()
+                .put("id", "id_f")
+                .put("newId", "nid_f")
+                .put("value", "f"))
+            .put(new JSONObject()
+                .put("id", "id_g")
+                .put("newId", "nid_g")
+                .put("value", "g"));
+
+        JSONArray overwrite = new JSONArray()
+            .put(new JSONObject()
+                .put("id", "id_f"))
+            .put(new JSONObject()
+                .put("id", "id_b")
+                .put("overwrite", "overwriteValue")
+                .put("value", "b2"))
+            .put(new JSONObject()
+                .put("newId", "nid_d")
+                .put("value", "d2"))
+            .put("e")
+            .put("h");
+
+        JSONArray expected = new JSONArray()
+            .put(new JSONObject()
+                .put("id", "id_f")
+                .put("newId", "nid_f")
+                .put("value", "f"))
+            .put(new JSONObject()
+                .put("id", "id_b")
+                .put("newId", "nid_b")
+                .put("base", "baseValue")
+                .put("overwrite", "overwriteValue")
+                .put("value", "b2"))
+            .put(new JSONObject()
+                .put("newId", "nid_d")
+                .put("value", "d2"))
+            .put("e")
+            .put("h");
+
+        JSONArray result = JSONUtils.overwrite(base, overwrite, "id");
+
+        Assert.assertTrue(String.format("Result is not as expected according to JSONUtils.equals().%nExpected:%n%s%nFound:%n%s",
+                expected.toString(4), result.toString(4)),
+            JSONUtils.equals(expected, result));
+
+
+        JSONArray expected2 = new JSONArray()
+            .put(new JSONObject()
+                .put("id", "id_f"))
+            .put(new JSONObject()
+                .put("id", "id_b")
+                .put("overwrite", "overwriteValue")
+                .put("value", "b2"))
+            .put(new JSONObject()
+                .put("id", "id_d")
+                .put("newId", "nid_d")
+                .put("value", "d2"))
+            .put("e")
+            .put("h");
+
+        JSONArray result2 = JSONUtils.overwrite(base, overwrite, "newId");
+
+        Assert.assertTrue(String.format("Result 2 is not as expected according to JSONUtils.equals().%nExpected:%n%s%nFound:%n%s",
+                expected2.toString(4), result2.toString(4)),
+            JSONUtils.equals(expected2, result2));
     }
 }

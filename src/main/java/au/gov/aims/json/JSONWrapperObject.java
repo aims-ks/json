@@ -94,7 +94,7 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
      */
     public JSONWrapperObject overwrite(JSONWrapperObject overwrites) {
         return new JSONWrapperObject(
-            JSONUtils.overwrites(this.jsonObject, overwrites.jsonObject),
+            JSONUtils.overwrite(this.jsonObject, overwrites.jsonObject),
             super.path
         );
     }
