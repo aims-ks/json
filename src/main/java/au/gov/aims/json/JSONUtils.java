@@ -271,6 +271,9 @@ public class JSONUtils {
         if (jsonValue1 == jsonValue2) {
             return true;
         }
+        if (jsonValue1 == null || jsonValue2 == null) {
+            return false;
+        }
 
         if (jsonValue1 instanceof JSONObject) {
             return (jsonValue2 instanceof JSONObject) ?

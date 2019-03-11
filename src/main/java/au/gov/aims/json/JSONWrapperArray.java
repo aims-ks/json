@@ -42,11 +42,11 @@ public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
     }
 
     public int length() {
-        return this.jsonArray.length();
+        return this.jsonArray == null ? 0 : this.jsonArray.length();
     }
 
     public Class getClass(int index) {
-        if (index >= this.jsonArray.length()) {
+        if (this.jsonArray == null || index < 0 || index >= this.jsonArray.length()) {
             return null;
         }
 
@@ -66,7 +66,7 @@ public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
         return (value == null ? defaultValue : value);
     }
     public <T> T get(Class<T> type, int index) throws InvalidJSONException {
-        if (index < 0 || this.jsonArray.length()-1 < index) {
+        if (this.jsonArray == null || index < 0 || index >= this.jsonArray.length()) {
             return null;
         }
 
@@ -84,6 +84,10 @@ public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
 
     @Override
     protected Collection<Integer> keySet() {
+        if (this.jsonArray == null) {
+            return null;
+        }
+
         List<Integer> keys = new ArrayList<Integer>();
         for (int i=0; i<this.jsonArray.length(); i++) {
             keys.add(i);
@@ -94,7 +98,7 @@ public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof JSONWrapperArray)) {
+        if (obj == null || !(obj instanceof JSONWrapperArray)) {
             return false;
         }
 
@@ -103,11 +107,11 @@ public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
 
     @Override
     public String toString() {
-        return this.jsonArray.toString();
+        return this.jsonArray == null ? null : this.jsonArray.toString();
     }
 
     @Override
     public String toString(int indentFactor) {
-        return this.jsonArray.toString(indentFactor);
+        return this.jsonArray == null ? null : this.jsonArray.toString(indentFactor);
     }
 }

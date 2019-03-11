@@ -41,15 +41,15 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
 
     @Override
     public Set<String> keySet() {
-        return this.jsonObject.keySet();
+        return this.jsonObject == null ? null : this.jsonObject.keySet();
     }
 
     public boolean has(String key) {
-        return this.jsonObject.has(key);
+        return this.jsonObject == null ? false : this.jsonObject.has(key);
     }
 
     public Class getClass(String key) {
-        if (!this.jsonObject.has(key)) {
+        if (this.jsonObject == null || !this.jsonObject.has(key)) {
             return null;
         }
 
@@ -69,7 +69,7 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
         return (value == null ? defaultValue : value);
     }
     public <T> T get(Class<T> type, String key) throws InvalidJSONException {
-        if (!this.jsonObject.has(key)) {
+        if (this.jsonObject == null || !this.jsonObject.has(key)) {
             return null;
         }
 
@@ -101,7 +101,7 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof JSONWrapperObject)) {
+        if (obj == null || !(obj instanceof JSONWrapperObject)) {
             return false;
         }
 
@@ -110,11 +110,11 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
 
     @Override
     public String toString() {
-        return this.jsonObject.toString();
+        return this.jsonObject == null ? null : this.jsonObject.toString();
     }
 
     @Override
     public String toString(int indentFactor) {
-        return this.jsonObject.toString(indentFactor);
+        return this.jsonObject == null ? null : this.jsonObject.toString(indentFactor);
     }
 }
