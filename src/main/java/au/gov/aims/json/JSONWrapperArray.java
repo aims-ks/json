@@ -21,97 +21,106 @@ package au.gov.aims.json;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
 public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
-    private JSONArray jsonArray;
+
+    protected JSONWrapperArray() {
+        this((JSONArray)null);
+    }
 
     public JSONWrapperArray(String jsonArrayStr) {
-        this(new JSONArray(jsonArrayStr), null);
+        this(new JSONArray(jsonArrayStr));
     }
 
     public JSONWrapperArray(JSONArray jsonArray) {
-        this(jsonArray, null);
+        super();
+        this.parse(jsonArray);
     }
 
-    protected JSONWrapperArray(JSONArray jsonArray, String path) {
-        super(path);
-        this.jsonArray = jsonArray;
+    private void parse(JSONArray jsonArray) {
+        if (jsonArray != null) {
+            for (int i=0; i<jsonArray.length(); i++) {
+                Object value = jsonArray.opt(i);
+                if (value == null || JSONObject.NULL.equals(value)) {
+                    super.put(i, null);
+                } else if (value instanceof JSONArray) {
+                    super.put(i, new JSONWrapperArray((JSONArray)value));
+                } else if (value instanceof JSONObject) {
+                    super.put(i, new JSONWrapperObject((JSONObject)value));
+                } else {
+                    super.put(i, value);
+                }
+            }
+        }
     }
 
-    public int length() {
-        return this.jsonArray == null ? 0 : this.jsonArray.length();
+    public JSONArray toJSON() {
+        JSONArray json = new JSONArray();
+
+        // NOTE: Extract values directly from the structure to avoid incrementing the visit count
+        Map<Integer, JSONWrapperValue> structure = this.getStructure();
+        for (int i=0; i<structure.size(); i++) {
+            JSONWrapperValue valueWrapper = structure.get(i);
+            Object value = JSONObject.NULL;
+            if (valueWrapper != null) {
+                Object rawValue = valueWrapper.getValue();
+                if (rawValue != null) {
+                    if (rawValue instanceof JSONWrapperArray) {
+                        value = ((JSONWrapperArray)rawValue).toJSON();
+                    } else if (rawValue instanceof JSONWrapperObject) {
+                        value = ((JSONWrapperObject)rawValue).toJSON();
+                    } else {
+                        value = rawValue;
+                    }
+                }
+            }
+
+            json.put(value);
+        }
+
+        return json;
     }
 
-    public Class getClass(int index) {
-        if (this.jsonArray == null || index < 0 || index >= this.jsonArray.length()) {
-            return null;
-        }
-
-        Class valueClass = this.jsonArray.opt(index).getClass();
-        if (JSONObject.class.equals(valueClass)) {
-            return JSONWrapperObject.class;
-        }
-        if (JSONArray.class.equals(valueClass)) {
-            return JSONWrapperArray.class;
-        }
-
-        return valueClass;
+    public JSONWrapperArray copy() {
+        JSONWrapperArray json = new JSONWrapperArray();
+        json.copyFrom(this);
+        return json;
     }
 
-    public <T> T get(Class<T> type, int index, T defaultValue) throws InvalidJSONException {
-        T value = this.get(type, index);
-        return (value == null ? defaultValue : value);
+    /**
+     * Returns a new {@link JSONWrapperArray} representing the current array (this) overwritten with
+     * the values from the overwrites parameter.
+     * Both the current object (this) and the overwrites parameter are unmodified.
+     * @param overwrites
+     * @return
+     */
+    public JSONWrapperArray overwrite(JSONWrapperArray overwrites) {
+        return this.overwrite(overwrites, null);
     }
-    public <T> T get(Class<T> type, int index) throws InvalidJSONException {
-        if (this.jsonArray == null || index < 0 || index >= this.jsonArray.length()) {
-            return null;
-        }
+    public JSONWrapperArray overwrite(JSONWrapperArray overwrites, String idKey) {
+        JSONWrapperArray copy = this.copy();
+        copy.inPlaceOverwrite(overwrites, idKey);
 
-        if (JSONObject.class.equals(type)) {
-            throw new IllegalArgumentException("Illegal class 'org.json.JSONObject'. Use 'au.gov.aims.json.JSONWrapperObject' instead.");
-        }
-        if (JSONArray.class.equals(type)) {
-            throw new IllegalArgumentException("Illegal class 'org.json.JSONArray'. Use 'au.gov.aims.json.JSONWrapperArray' instead.");
-        }
-
-        Object rawValue = this.jsonArray.opt(index);
-
-        return super.getValueAndCountVisit(type, index, rawValue);
-    }
-
-    @Override
-    protected Collection<Integer> keySet() {
-        if (this.jsonArray == null) {
-            return null;
-        }
-
-        List<Integer> keys = new ArrayList<Integer>();
-        for (int i=0; i<this.jsonArray.length(); i++) {
-            keys.add(i);
-        }
-
-        return keys;
+        return copy;
     }
 
     @Override
     public boolean equals(Object obj) {
+        // Same instance
+        if (this == obj) {
+            return true;
+        }
+
         if (obj == null || !(obj instanceof JSONWrapperArray)) {
             return false;
         }
 
-        return JSONUtils.equals(this.jsonArray, ((JSONWrapperArray)obj).jsonArray);
-    }
-
-    @Override
-    public String toString() {
-        return this.jsonArray == null ? null : this.jsonArray.toString();
+        return super.equals(obj);
     }
 
     @Override
     public String toString(int indentFactor) {
-        return this.jsonArray == null ? null : this.jsonArray.toString(indentFactor);
+        return this.toJSON().toString(indentFactor);
     }
 }

@@ -18,10 +18,32 @@
  */
 package au.gov.aims.json;
 
-/**
- * @deprecated Use JSONWrapperAbstract
- * @param <K>
- */
-@Deprecated
-public abstract class JSONAbstract<K> extends JSONWrapperAbstract<K> {
+public class JSONWrapperValue {
+    private Object value;
+    private int count;
+
+    public JSONWrapperValue(Object value) {
+        this(value, 0);
+    }
+
+    public JSONWrapperValue(Object value, int count) {
+        this.value = value;
+        this.count = count;
+    }
+
+    public Object getValue() {
+        return this.value;
+    }
+
+    public int getCount() {
+        return this.count;
+    }
+
+    public void incrementCount() {
+        this.incrementCount(1);
+    }
+
+    public void incrementCount(int increment) {
+        this.count += increment;
+    }
 }

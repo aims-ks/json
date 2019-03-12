@@ -21,68 +21,81 @@ package au.gov.aims.json;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Map;
 import java.util.Set;
 
 public class JSONWrapperObject extends JSONWrapperAbstract<String> {
-    private JSONObject jsonObject;
+
+    protected JSONWrapperObject() {
+        this((JSONObject)null);
+    }
+
 
     public JSONWrapperObject(String jsonObjectStr) {
-        this(new JSONObject(jsonObjectStr), null);
+        this(new JSONObject(jsonObjectStr));
     }
 
     public JSONWrapperObject(JSONObject jsonObject) {
-        this(jsonObject, null);
+        super();
+        this.parse(jsonObject);
     }
 
-    protected JSONWrapperObject(JSONObject jsonObject, String path) {
-        super(path);
-        this.jsonObject = jsonObject;
+    private void parse(JSONObject jsonObject) {
+        if (jsonObject != null) {
+            for (String key : jsonObject.keySet()) {
+                Object value = jsonObject.opt(key);
+                if (value == null || JSONObject.NULL.equals(value)) {
+                    super.put(key, null);
+                } else if (value instanceof JSONArray) {
+                    super.put(key, new JSONWrapperArray((JSONArray)value));
+                } else if (value instanceof JSONObject) {
+                    super.put(key, new JSONWrapperObject((JSONObject)value));
+                } else {
+                    super.put(key, value);
+                }
+            }
+        }
     }
 
-    @Override
+    public JSONObject toJSON() {
+        JSONObject json = new JSONObject();
+
+        // NOTE: Extract values directly from the structure to avoid incrementing the visit count
+        Map<String, JSONWrapperValue> structure = this.getStructure();
+        for (String key : structure.keySet()) {
+            JSONWrapperValue valueWrapper = structure.get(key);
+            Object value = JSONObject.NULL;
+            if (valueWrapper != null) {
+                Object rawValue = valueWrapper.getValue();
+                if (rawValue != null) {
+                    if (rawValue instanceof JSONWrapperArray) {
+                        value = ((JSONWrapperArray)rawValue).toJSON();
+                    } else if (rawValue instanceof JSONWrapperObject) {
+                        value = ((JSONWrapperObject)rawValue).toJSON();
+                    } else {
+                        value = rawValue;
+                    }
+                }
+            }
+
+            json.put(key, value);
+        }
+
+        return json;
+    }
+
     public Set<String> keySet() {
-        return this.jsonObject == null ? null : this.jsonObject.keySet();
+        return super.getStructure().keySet();
     }
 
     public boolean has(String key) {
-        return this.jsonObject == null ? false : this.jsonObject.has(key);
+        return super.getStructure().containsKey(key);
     }
 
-    public Class getClass(String key) {
-        if (this.jsonObject == null || !this.jsonObject.has(key)) {
-            return null;
-        }
-
-        Class valueClass = this.jsonObject.opt(key).getClass();
-        if (JSONObject.class.equals(valueClass)) {
-            return JSONWrapperObject.class;
-        }
-        if (JSONArray.class.equals(valueClass)) {
-            return JSONWrapperArray.class;
-        }
-
-        return valueClass;
-    }
-
-    public <T> T get(Class<T> type, String key, T defaultValue) throws InvalidJSONException {
-        T value = this.get(type, key);
-        return (value == null ? defaultValue : value);
-    }
-    public <T> T get(Class<T> type, String key) throws InvalidJSONException {
-        if (this.jsonObject == null || !this.jsonObject.has(key)) {
-            return null;
-        }
-
-        if (JSONObject.class.equals(type)) {
-            throw new IllegalArgumentException("Illegal class 'org.json.JSONObject'. Use 'au.gov.aims.json.JSONWrapperObject' instead.");
-        }
-        if (JSONArray.class.equals(type)) {
-            throw new IllegalArgumentException("Illegal class 'org.json.JSONArray'. Use 'au.gov.aims.json.JSONWrapperArray' instead.");
-        }
-
-        Object rawValue = this.jsonObject.opt(key);
-
-        return super.getValueAndCountVisit(type, key, rawValue);
+    public JSONWrapperObject copy() {
+        JSONWrapperObject json = new JSONWrapperObject();
+        json.copyFrom(this);
+        return json;
     }
 
     /**
@@ -93,28 +106,31 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
      * @return
      */
     public JSONWrapperObject overwrite(JSONWrapperObject overwrites) {
-        return new JSONWrapperObject(
-            JSONUtils.overwrite(this.jsonObject, overwrites.jsonObject),
-            super.path
-        );
+        return this.overwrite(overwrites, null);
+    }
+    public JSONWrapperObject overwrite(JSONWrapperObject overwrites, String idKey) {
+        JSONWrapperObject copy = this.copy();
+        copy.inPlaceOverwrite(overwrites, idKey);
+
+        return copy;
     }
 
     @Override
     public boolean equals(Object obj) {
+        // Same instance
+        if (this == obj) {
+            return true;
+        }
+
         if (obj == null || !(obj instanceof JSONWrapperObject)) {
             return false;
         }
 
-        return JSONUtils.equals(this.jsonObject, ((JSONWrapperObject)obj).jsonObject);
-    }
-
-    @Override
-    public String toString() {
-        return this.jsonObject == null ? null : this.jsonObject.toString();
+        return super.equals(obj);
     }
 
     @Override
     public String toString(int indentFactor) {
-        return this.jsonObject == null ? null : this.jsonObject.toString(indentFactor);
+        return this.toJSON().toString(indentFactor);
     }
 }

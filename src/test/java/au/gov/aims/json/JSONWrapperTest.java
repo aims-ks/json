@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.io.InvalidClassException;
 import java.util.Set;
 
 public class JSONWrapperTest {
@@ -69,6 +70,12 @@ public class JSONWrapperTest {
             Double population = country.get(Double.class, "population");
         }
 
+        // Check for property that has never been read
+        neverVisited = jsonObject.getNeverVisited();
+        Assert.assertNotNull("List of never visited attribute is null after reading countries", neverVisited);
+        Assert.assertFalse("List of never visited attribute is empty after reading countries", neverVisited.isEmpty());
+
+
         // Try to load an array
         JSONWrapperArray group = jsonObject.get(JSONWrapperArray.class, "group");
         Assert.assertNotNull("Group is null", group);
@@ -87,11 +94,13 @@ public class JSONWrapperTest {
         Assert.assertNotNull("Reading missing property with default value returned null", missingWithDefault);
         Assert.assertEquals("Reading missing property with default didn't returned the default", "Default", missingWithDefault);
 
+
         // Try to load a property using the wrong type
         try {
             jsonObject.get(JSONWrapperObject.class, "vanished");
             Assert.fail("Getting an attribute using the wrong class should throw an exception");
-        } catch (InvalidJSONException ex) {}
+        } catch (InvalidClassException ex) {}
+
 
         // Check for property that has never been read
         neverVisited = jsonObject.getNeverVisited();
