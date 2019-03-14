@@ -21,6 +21,7 @@ package au.gov.aims.json;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
@@ -36,6 +37,11 @@ public class JSONWrapperArray extends JSONWrapperAbstract<Integer> {
     public JSONWrapperArray(JSONArray jsonArray) {
         super();
         this.parse(jsonArray);
+    }
+
+    public JSONWrapperArray(Collection collection) {
+        super();
+        this.parse(new JSONArray(collection));
     }
 
     private void parse(JSONArray jsonArray) {

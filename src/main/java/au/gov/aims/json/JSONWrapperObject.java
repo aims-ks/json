@@ -40,6 +40,11 @@ public class JSONWrapperObject extends JSONWrapperAbstract<String> {
         this.parse(jsonObject);
     }
 
+    public JSONWrapperObject(Map map) {
+        super();
+        this.parse(new JSONObject(map));
+    }
+
     private void parse(JSONObject jsonObject) {
         if (jsonObject != null) {
             for (String key : jsonObject.keySet()) {
