@@ -160,12 +160,17 @@ public class JSONUtils {
         }
 
         if (Double.class.equals(type)) {
-            // Integer can be cast as Double
+            // Integer can be convert to Double
             if (value instanceof Integer) {
                 Integer intValue = (Integer)value;
                 return (T)new Double(intValue.doubleValue());
             }
-            // Float can be cast as Double
+            // Long can be convert to Double
+            if (value instanceof Long) {
+                Long longValue = (Long)value;
+                return (T)new Double(longValue.doubleValue());
+            }
+            // Float can be convert to Double
             if (value instanceof Float) {
                 Float floatValue = (Float)value;
                 return (T)new Double(floatValue.doubleValue());
@@ -173,15 +178,28 @@ public class JSONUtils {
         }
 
         if (Float.class.equals(type)) {
-            // Integer can be cast as Float
+            // Integer can be convert to Float
             if (value instanceof Integer) {
                 Integer intValue = (Integer)value;
                 return (T)new Float(intValue.floatValue());
             }
-            // Double can be cast as Float (most of the time)
+            // Long can be convert to Float (sometime)
+            if (value instanceof Long) {
+                Long longValue = (Long)value;
+                return (T)new Float(longValue.floatValue());
+            }
+            // Double can be convert to Float (sometime)
             if (value instanceof Double) {
                 Double doubleValue = (Double)value;
                 return (T)new Float(doubleValue.floatValue());
+            }
+        }
+
+        if (Long.class.equals(type)) {
+            // Integer can be convert to Double
+            if (value instanceof Integer) {
+                Integer intValue = (Integer)value;
+                return (T)new Long(intValue.longValue());
             }
         }
 

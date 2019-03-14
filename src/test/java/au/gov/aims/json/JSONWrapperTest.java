@@ -67,7 +67,7 @@ public class JSONWrapperTest {
             String name       = country.get(String.class, "name");
             String capital    = country.get(String.class, "capital");
             Float area        = country.get(Float.class, "area");
-            Double population = country.get(Double.class, "population");
+            Long population   = country.get(Long.class, "population", 0L);
         }
 
         // Check for property that has never been read
