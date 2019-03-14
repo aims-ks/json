@@ -154,9 +154,9 @@ public class JSONUtils {
 
         // Type equivalence
 
-        // Everything can be cast as a String
+        // Everything can be converted into a String
         if (String.class.equals(type)) {
-            return (T)value;
+            return (T)value.toString();
         }
 
         if (Double.class.equals(type)) {

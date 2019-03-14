@@ -18,6 +18,7 @@
  */
 package au.gov.aims.json;
 
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +37,9 @@ public class JSONWrapperTest {
         try {
             jsonConfigStream = JSONWrapperTest.class.getClassLoader().getResourceAsStream(jsonFilePath);
             String jsonConfigStr = JSONUtils.streamToString(jsonConfigStream);
-            jsonObject = new JSONWrapperObject(jsonConfigStr);
+            JSONObject json = new JSONObject(jsonConfigStr);
+            json.put("enum", DummyEnum.FRI);
+            jsonObject = new JSONWrapperObject(json);
         } finally {
             if (jsonConfigStream != null) {
                 try {
@@ -107,6 +110,9 @@ public class JSONWrapperTest {
         Assert.assertNotNull("List of never visited attribute is null", neverVisited);
         Assert.assertFalse("List of never visited attribute is empty", neverVisited.isEmpty());
 
+        // Load enum as String
+        Assert.assertEquals("Wrong extracted enum", "FRI", jsonObject.get(String.class, "enum"));
+
         // Visit the remaining element
         jsonObject.get(String.class, "vanished");
 
@@ -115,4 +121,7 @@ public class JSONWrapperTest {
         Assert.assertTrue("List of never visited attribute is not empty: " + neverVisited, neverVisited == null || neverVisited.isEmpty());
     }
 
+    public enum DummyEnum {
+        MON, TUE, WED, THU, FRI, SAT, SUN
+    }
 }
