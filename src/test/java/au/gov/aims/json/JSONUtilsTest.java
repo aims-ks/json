@@ -172,6 +172,48 @@ public class JSONUtilsTest {
     }
 
     @Test
+    public void testArrayNotOverwritten() {
+        JSONObject base = new JSONObject()
+            .put("str", "orig")
+            .put("array", new JSONArray()
+                .put("a")
+                .put("b")
+                .put("c"));
+
+        JSONObject overwrites = new JSONObject()
+            .put("str", "overwritten");
+
+        JSONObject expected = new JSONObject()
+            .put("str", "overwritten")
+            .put("array", new JSONArray()
+                .put("a")
+                .put("b")
+                .put("c"));
+
+        JSONObject result = JSONUtils.overwrite(base, overwrites);
+
+        Assert.assertNotNull("Overwrite result is null", result);
+
+        // Test attribute presence
+        Assert.assertTrue("Missing str property", result.has("str"));
+        Assert.assertTrue("Missing array property", result.has("array"));
+
+        // Test attribute value
+        Assert.assertEquals("Wrong str value", "overwritten", result.optString("str", null));
+
+        JSONArray jsonArray = result.optJSONArray("array");
+        Assert.assertEquals("Wrong array length", 3, jsonArray.length());
+        Assert.assertEquals("Wrong array 1st value", "a", jsonArray.optString(0));
+        Assert.assertEquals("Wrong array 2nd value", "b", jsonArray.optString(1));
+        Assert.assertEquals("Wrong array 3rd value", "c", jsonArray.optString(2));
+
+        Assert.assertNotEquals("Overwrites and result are the same, the overwrite method has modified its input", overwrites, result);
+        Assert.assertNotEquals("Base and result are the same, the overwrite method has modified its input", base, result);
+
+        Assert.assertTrue("Result is not as expected according to JSONUtils.equals()", JSONUtils.equals(expected, result));
+    }
+
+    @Test
     public void testArrayOverwrite() {
         JSONArray base = new JSONArray()
             .put("a")
