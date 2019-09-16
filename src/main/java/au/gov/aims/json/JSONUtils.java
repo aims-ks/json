@@ -68,8 +68,9 @@ public class JSONUtils {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (!removeComments || !line.trim().startsWith("//")) {
-                    sb.append(line).append("\n");
+                    sb.append(line);
                 }
+                sb.append("\n");
             }
         } finally {
             if (bufferedReader != null) {
