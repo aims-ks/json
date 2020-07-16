@@ -11,7 +11,10 @@ jobs:
   deploy:
     name: Deploy to Github Packages
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+
+    container:
+      image: maven:3.6-alpine
 
     steps:
 
